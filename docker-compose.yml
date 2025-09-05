@@ -1,0 +1,13 @@
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: realtor-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data/db
+    restart: unless-stopped
+    # No auth as requested
+    environment:
+      MONGO_INITDB_DATABASE: realtor
+

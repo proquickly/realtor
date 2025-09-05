@@ -1,0 +1,31 @@
+[project]
+name = "realtor"
+version = "0.1.0"
+description = "Flet web UI for capturing property seller descriptions and structured data, stored in MongoDB."
+readme = "README.md"
+authors = [
+    { name = "Andy Miles", email = "akmiles@icloud.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "flet>=0.24.1",
+    "pymongo>=4.8.0",
+    "python-dotenv>=1.0.1",
+    "pydantic>=2.7.0",
+    "usaddress>=0.5.10",
+    "phonenumbers>=8.13.0",
+    "spacy>=3.7.0"
+]
+
+[project.optional-dependencies]
+# Dev/test dependency group (can be installed via: uv add --group test pytest)
+test = [
+    "pytest>=8.2.0"
+]
+
+[project.scripts]
+realator = "realtor:main"
+
+[build-system]
+requires = ["uv_build>=0.8.15,<0.9.0"]
+build-backend = "uv_build"
