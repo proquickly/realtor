@@ -65,12 +65,12 @@ def save_property_data(data: Dict[str, Any]) -> str:
 
 def list_recent(limit: int = 10) -> List[Dict[str, Any]]:
     raw_col, structured_col = collections()
-    cursor = structured_col.find({}, {"_id": 1, "description_raw_id": 1, "seller_name": 1, "address": 1, "created_at": 1}).sort("created_at", -1).limit(limit)
+    cursor = structured_col.find({}, {"_id": 1, "description_raw_id": 1, "contact_name": 1, "address": 1, "created_at": 1}).sort("created_at", -1).limit(limit)
     return [
         {
             "id": str(doc.get("_id")),
             "description_raw_id": doc.get("description_raw_id"),
-            "seller_name": doc.get("seller_name"),
+            "contact_name": doc.get("contact_name"),
             "address": doc.get("address"),
             "created_at": doc.get("created_at"),
         }

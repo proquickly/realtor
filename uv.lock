@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.11"
 
 [[package]]
@@ -847,6 +847,11 @@ test = [
     { name = "pytest" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "realtor" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "flet", specifier = ">=0.24.1" },
@@ -859,6 +864,9 @@ requires-dist = [
     { name = "usaddress", specifier = ">=0.5.10" },
 ]
 provides-extras = ["test"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "realtor", editable = "." }]
 
 [[package]]
 name = "repath"
