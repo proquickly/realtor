@@ -14,7 +14,7 @@ def test_basic_parse_example():
     data = parse_free_text_to_structured(text)
 
     # Spot-check expectations; parser is heuristic, so be flexible
-    assert data["seller_name"] in {"John Doe", None}
+    assert data["contact_name"] in {"John Doe", None}
     assert data["price"] == pytest.approx(350000.0)
     assert data["bedrooms"] == pytest.approx(3.0)
     assert data["bathrooms"] == pytest.approx(2.5)

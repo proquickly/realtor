@@ -8,14 +8,14 @@ from pydantic import BaseModel, Field
 
 class Address(BaseModel):
     street: Optional[str] = None
-    unit: Optional[str] = None
+    #unit: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None
     postal_code: Optional[str] = None
     country: str = "US"
 
 
-class SellerDescriptionRaw(BaseModel):
+class ContactDescriptionRaw(BaseModel):
     text: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -25,7 +25,7 @@ class PropertyData(BaseModel):
     description_raw_id: str
 
     # Contact
-    seller_name: Optional[str] = None
+    contact_name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
 

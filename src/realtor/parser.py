@@ -148,7 +148,7 @@ def extract_address(text: str) -> Dict[str, Optional[str]]:
     try:
         tagged, _ = usaddress.tag(text)
     except usaddress.RepeatedLabelError:
-        return {"street": None, "unit": None, "city": None, "state": None, "postal_code": None}
+        return {"street": None,"city": None, "state": None, "postal_code": None}
 
     street_parts = [
         tagged.get("AddressNumber"),
@@ -160,20 +160,19 @@ def extract_address(text: str) -> Dict[str, Optional[str]]:
     ]
     street = " ".join([p for p in street_parts if p]) or None
 
-    unit_parts = [tagged.get("OccupancyType"), tagged.get("OccupancyIdentifier")]
-    unit = " ".join([p for p in unit_parts if p]) or None
+    #unit_parts = [tagged.get("OccupancyType"), tagged.get("OccupancyIdentifier")]
+    #unit = " ".join([p for p in unit_parts if p]) or None
 
     return {
         "street": street,
-        "unit": unit,
         "city": tagged.get("PlaceName"),
         "state": tagged.get("StateName"),
         "postal_code": tagged.get("ZipCode"),
     }
 
 
-def extract_seller_name(doc: spacy.tokens.Doc) -> Optional[str]:
-    # First PERSON entity is likely the seller name
+def extract_contact_name(doc: spacy.tokens.Doc) -> Optional[str]:
+    # First PERSON entity is likely the contact name
     for ent in doc.ents:
         if ent.label_ == "PERSON":
             return ent.text
@@ -185,7 +184,7 @@ def parse_free_text_to_structured(text: str) -> Dict[str, Any]:
     doc = nlp(text)
 
     data: Dict[str, Any] = {
-        "seller_name": extract_seller_name(doc),
+        "contact_name": extract_contact_name(doc),
         "email": extract_email(text),
         "phone": extract_phone(text),
         "address": extract_address(text) | {"country": "US"},
@@ -201,8 +200,8 @@ def parse_free_text_to_structured(text: str) -> Dict[str, Any]:
 
     # Notes can accumulate ambiguous or leftover hints (simple heuristic for now)
     notes: List[str] = []
-    if not data.get("seller_name"):
-        notes.append("Seller name not confidently detected.")
+    if not data.get("contact_name"):
+        notes.append("Contact name not confidently detected.")
     if not any(data["address"].get(k) for k in ("street", "city", "state", "postal_code")):
         notes.append("Address not confidently detected.")
     if notes:

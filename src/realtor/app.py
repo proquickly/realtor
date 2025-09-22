@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import flet as ft
+from flet import Icon
 
 from .db import save_raw_description, save_property_data, list_recent
 from .models import PropertyData
@@ -31,12 +32,12 @@ def main(page: ft.Page) -> None:
     )
 
     # Parsed fields (editable)
-    seller_name = ft.TextField(label="Seller name", width=400)
+    contact_name = ft.TextField(label="Contact name", width=400)
     email = ft.TextField(label="Email", width=400)
     phone = ft.TextField(label="Phone (E.164)", width=400)
 
     street = ft.TextField(label="Street", width=500)
-    unit = ft.TextField(label="Unit", width=200)
+    #unit = ft.TextField(label="Unit", width=200)
     city = ft.TextField(label="City", width=250)
     state = ft.TextField(label="State", width=120)
     postal_code = ft.TextField(label="Postal code", width=160)
@@ -53,8 +54,30 @@ def main(page: ft.Page) -> None:
     amenities = ft.TextField(label="Amenities (comma-separated)", width=600)
     parking = ft.TextField(label="Parking", width=240)
     hoa_fees = ft.TextField(label="HOA fees ($/mo)", width=200)
+    property_photos_picker = ft.FilePicker()
+    page.overlay.append(property_photos_picker)
+
+    uploaded_photos = ft.Text(value="No photos selected")
+
+    upload_photos_btn = ft.ElevatedButton(
+        "Upload Property Photos",
+        icon=ft.Icon(name="upload_file"),
+        on_click=lambda _: property_photos_picker.pick_files(
+            allow_multiple=True,
+            file_type=ft.FilePickerFileType.IMAGE
+        ),
+    )
 
     notes = ft.TextField(label="Notes", width=700, multiline=True, min_lines=2, max_lines=4)
+
+    def on_photos_selected(e: ft.FilePickerResultEvent):
+        if e.files:
+            uploaded_photos.value = ", ".join([f.name for f in e.files])
+        else:
+            uploaded_photos.value = "No photos selected"
+        page.update()
+
+    property_photos_picker.on_result = on_photos_selected
 
     # History
     history_list = ft.ListView(expand=True, spacing=6, padding=0)
@@ -84,12 +107,12 @@ def main(page: ft.Page) -> None:
         page.update()
 
     def populate_form(data: dict) -> None:
-        seller_name.value = data.get("seller_name") or ""
+        contact_name.value = data.get("contact_name") or ""
         email.value = data.get("email") or ""
         phone.value = data.get("phone") or ""
         addr = data.get("address") or {}
         street.value = addr.get("street") or ""
-        unit.value = addr.get("unit") or ""
+        #unit.value = addr.get("unit") or ""
         city.value = addr.get("city") or ""
         state.value = addr.get("state") or ""
         postal_code.value = addr.get("postal_code") or ""
@@ -136,12 +159,12 @@ def main(page: ft.Page) -> None:
             # Build structured dict from form
             structured = {
                 "description_raw_id": raw_id,
-                "seller_name": (seller_name.value or None),
+                "contact_name": (contact_name.value or None),
                 "email": (email.value or None),
                 "phone": (phone.value or None),
                 "address": {
                     "street": (street.value or None),
-                    "unit": (unit.value or None),
+                    #"unit": (unit.value or None),
                     "city": (city.value or None),
                     "state": (state.value or None),
                     "postal_code": (postal_code.value or None),
@@ -158,6 +181,7 @@ def main(page: ft.Page) -> None:
                 "parking": (parking.value or None),
                 "hoa_fees": float(hoa_fees.value) if hoa_fees.value else None,
                 "notes": (notes.value or None),
+                "photos": [f.name for f in (property_photos_picker.result.files or [])] if property_photos_picker.result else [],
             }
             # Validate with Pydantic
             _ = PropertyData(**structured)
@@ -168,21 +192,21 @@ def main(page: ft.Page) -> None:
             page.snack_bar = ft.SnackBar(ft.Text(f"Save failed: {ex}"), open=True)
         page.update()
 
-    parse_btn = ft.ElevatedButton("Parse details", icon=ft.Icons.PLAY_ARROW, on_click=handle_parse)
-    reset_btn = ft.OutlinedButton("Reset", icon=ft.Icons.CLEAR, on_click=handle_reset)
-    save_btn = ft.FilledButton("Save both", icon=ft.Icons.SAVE, on_click=handle_save)
+    parse_btn = ft.ElevatedButton("Parse details", icon=ft.Icon(name="play_arrow"), on_click=handle_parse)
+    reset_btn = ft.OutlinedButton("Reset", icon=ft.Icon(name="clear"), on_click=handle_reset)
+    save_btn = ft.FilledButton("Save both", icon=ft.Icon(name="save"), on_click=handle_save)
 
     form_grid = ft.ResponsiveRow([
-        ft.Column([seller_name, email, phone], col={"xs": 12, "sm": 6}),
+        ft.Column([contact_name, email, phone], col={"xs": 12, "sm": 6}),
         ft.Column([
-            ft.Row([street, unit]),
+            ft.Row([street]),
             ft.Row([city, state, postal_code, country]),
         ], col={"xs": 12, "sm": 6}),
         ft.Column([
             ft.Row([price, bedrooms, bathrooms, square_feet]),
             ft.Row([lot_size, year_built, property_type]),
         ], col=12),
-        ft.Column([amenities, parking, hoa_fees, notes], col=12),
+        ft.Column([amenities, parking, hoa_fees, notes, upload_photos_btn, uploaded_photos], col=12),
     ], spacing=12)
 
     layout = ft.Tabs(
